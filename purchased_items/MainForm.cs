@@ -105,9 +105,8 @@ namespace purchased_items
 			</purchases>";
 	}
 	internal class UserPurchase
-	{
-		// Internal set makes item ReadOnly in view
-		public string Name { get; internal set; }
+	{		
+		public string Name { get; internal set; } // Internal makes item ReadOnly in view
 		public string Purchase { get; internal set; }
 	}
 
