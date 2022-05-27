@@ -31,14 +31,15 @@ namespace purchased_items
 		private void initList1()
 		{
 			XElement xsource = XElement.Parse(source);
-			XElement[] names = xsource.Elements("name").ToArray();
-            foreach (XElement xuser in names)
+			XElement[] xusers = xsource.Elements("user").ToArray();
+            foreach (XElement xuser in xusers)
             {
-				XElement[] xpurchases = xuser.Elements("item").ToArray();
-                foreach (var xpurchase in xpurchases)
+				XElement[] xpurchases = xuser.Element("items").Elements("item").ToArray();
+                foreach (XElement xpurchase in xpurchases)
                 {
-					// Every time you add a record to the list, it appears in the View automatically.
-					PurchasesByUser.Add(new UserPurchase(name: (string)xuser, purchase: (string)xpurchase));
+					var xname = xuser.Element("name");
+                    // Every time you add a record to the list, it appears in the View automatically.
+                    PurchasesByUser.Add(new UserPurchase(name: (string)xname, purchase: (string)xpurchase));
                 }
             }
 			var groups = PurchasesByUser.GroupBy(purchase => purchase.Purchase);
@@ -50,35 +51,46 @@ namespace purchased_items
 		}
 
         const string source =
-		@"<purchases>
-			<name>John Doe
-				<item>Shoes</item>
-				<item>T-Shirts</item>
-				<item>Jeans</item>
-			</name>
-			<name>
-				Rick Astley
-				<item>Baseball bat</item>
-				<item>Sandwich</item>
-				<item>T-Shirts</item>
-				<item>Shoes</item>
-			</name>
-			<name>
-				Jane Doe
-				<item>Shoes</item>
-				<item>T-Shirts</item>
-			</name>
-			<name>
-				Anonymous
-				<item>Laptop</item>
-			</name>
-			<name>
-				Joe Mm.
-				<item>Milk</item>
-				<item>Shoes</item>
-			</name>
-		</purchases>";
-    }
+			@"<purchases>
+				<user>
+					<name>John Doe</name>
+					<items>
+						<item>Shoes</item>
+						<item>T-Shirts</item>
+						<item>Jeans</item>
+					</items>
+				</user>
+				<user>
+					<name>Rick Astley</name>
+					<items>
+						<item>Baseball bat</item>
+						<item>Sandwich</item>
+						<item>T-Shirts</item>
+						<item>Shoes</item>
+					</items>
+				</user>
+				<user>
+					<name>Jane Doe</name>
+					<items>
+						<item>Shoes</item>
+						<item>T-Shirts</item>
+					</items>
+				</user>
+				<user>
+					<name>Anonymous</name>
+					<items>
+						<item>Laptop</item>
+					</items>
+				</user>
+				<user>
+					<name>Joe Mm.</name>
+					<items>
+						<item>Milk</item>
+						<item>Shoes</item>
+					</items>
+				</user>
+			</purchases>";
+	}
 	internal class UserPurchase
 	{
 		public UserPurchase(string name, string purchase)
