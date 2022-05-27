@@ -24,6 +24,11 @@ namespace purchased_items
 				dataGridView1.DataSource = PurchasesByUser;
 				dataGridView2.DataSource = PurchasedByItem;
 				initList1();
+				dataGridView1.Columns[nameof(UserPurchase.Name)].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+				dataGridView2.Columns[nameof(PurchasedItem.Description)].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+				dataGridView2.Columns[nameof(PurchasedItem.Count)].AutoSizeMode = DataGridViewAutoSizeColumnMode.ColumnHeader;
+				dataGridView1.AllowUserToAddRows = false;
+				dataGridView2.AllowUserToAddRows = false;
 			}
 		}
 		internal BindingList<UserPurchase> PurchasesByUser { get; } = new BindingList<UserPurchase>();
@@ -39,12 +44,13 @@ namespace purchased_items
                 foreach (XElement xpurchase in xpurchases)
                 {
 					var xname = xuser.Element("name");
-                    // Every time you add a record to the list, it appears in the View automatically.
-                    PurchasesByUser.Add(new UserPurchase(name: (string)xname, purchase: (string)xpurchase));
+					// Every time you add a record to the list, it appears in the View automatically.
+					PurchasesByUser.Add(new UserPurchase { Name = (string)xname, Purchase = (string)xpurchase });
                 }
             }
 			// Make what is essentially a list *of* lists using System.Linq.GroupBy
-			var groups = PurchasesByUser.GroupBy(purchase => purchase.Purchase);
+			var groups = 
+				PurchasesByUser.GroupBy(purchase => purchase.Purchase);
             foreach (var group in groups)
             {
 				// Decoding the Group:
@@ -52,7 +58,7 @@ namespace purchased_items
 					$"The group '{group.Key}' holds {group.Count()} items");
 				Debug.WriteLine(
 					$"The customers are { string.Join(",", group.ToList().Select(item=>item.Name))}");
-				var byItem = new PurchasedItem(group.Key, group.Count());
+				var byItem = new PurchasedItem { Description = group.Key, Count = group.Count() };
 				PurchasedByItem.Add(byItem);
 			}
 		}
@@ -100,25 +106,15 @@ namespace purchased_items
 	}
 	internal class UserPurchase
 	{
-		public UserPurchase(string name, string purchase)
-        {
-			Name = name;
-			Purchase = purchase;
-        }
-		public string Name { get;  }
-		public string Purchase { get;  } 
+		// Internal set makes item ReadOnly in view
+		public string Name { get; internal set; }
+		public string Purchase { get; internal set; }
 	}
 
 
 	internal class PurchasedItem
     {
-        public PurchasedItem(string description, int count)
-        {
-            Description = description;
-            Count = count;
-        }
-
-        public string Description { get; }
-        public int Count { get; }
+        public string Description { get; internal set; }
+        public int Count { get; internal set; }
     }
 }
