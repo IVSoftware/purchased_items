@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows.Forms;
 using System.Xml.Linq;
@@ -42,9 +43,15 @@ namespace purchased_items
                     PurchasesByUser.Add(new UserPurchase(name: (string)xname, purchase: (string)xpurchase));
                 }
             }
+			// Make what is essentially a list *of* lists using System.Linq.GroupBy
 			var groups = PurchasesByUser.GroupBy(purchase => purchase.Purchase);
             foreach (var group in groups)
             {
+				// Decoding the Group:
+                Debug.WriteLine(
+					$"The group '{group.Key}' holds {group.Count()} items");
+				Debug.WriteLine(
+					$"The customers are { string.Join(",", group.ToList().Select(item=>item.Name))}");
 				var byItem = new PurchasedItem(group.Key, group.Count());
 				PurchasedByItem.Add(byItem);
 			}
